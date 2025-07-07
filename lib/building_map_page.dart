@@ -1,5 +1,7 @@
 // lib/building_map_page.dart
 
+//ddfsdfadfasdfasdfasdfasdfasdf
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'svg_data_parser.dart'; // 경로 확인 필요
@@ -156,9 +158,6 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                           final color = isSelected
                               ? Colors.blue.withOpacity(0.7)
                               : Colors.blue.withOpacity(0.2);
-                          final color = isSelected
-                              ? Colors.blue.withOpacity(0.7)
-                              : Colors.blue.withOpacity(0.2);
 
                           if (buttonData.containsKey('path')) {
                             return Positioned(
@@ -243,8 +242,7 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                           '$floor',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.indigo,
-                            color: isSelected ? Colors.white : Colors.indigo,
+                            color: isSelected ? Colors.white : Colors.indigo
                           ),
                         ),
                       ),
