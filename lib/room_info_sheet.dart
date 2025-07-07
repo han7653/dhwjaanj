@@ -17,9 +17,9 @@ class RoomInfoSheet extends StatelessWidget {
     required this.roomInfo,
     required this.onDeparture,
     required this.onArrival,
-    this.initialChildSize = 0.13,
-    this.minChildSize = 0.10,
-    this.maxChildSize = 0.22,
+    this.initialChildSize = 0.32,
+    this.minChildSize = 0.32,
+    this.maxChildSize = 0.37,
   });
 
   @override
