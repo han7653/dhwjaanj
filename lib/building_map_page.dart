@@ -11,6 +11,10 @@ import 'path_painter.dart';      // 경로 확인 필요
 class BuildingMapPage extends StatefulWidget {
   const BuildingMapPage({super.key});
 
+  // 요청 받은거 열어서 
+  // assets 경로에 저장을 해두고, 
+  // 밑에서 똑같이 쓰면 될듯??????
+
   @override
   State<BuildingMapPage> createState() => _BuildingMapPageState();
 }
