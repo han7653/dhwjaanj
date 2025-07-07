@@ -1,3 +1,5 @@
+// lib/navigation_data.dart
+
 import 'package:flutter/material.dart';
 
 // 각 노드의 ID와 좌표를 저장하는 클래스
@@ -34,11 +36,26 @@ final Map<String, NavNode> allNavNodes = {
   "b9": NavNode(id: "b9", position: const Offset(167.17755, 198.34213)),
   "b10": NavNode(id: "b10", position: const Offset(62.66713, 113.99628)),
   "b11": NavNode(id: "b11", position: const Offset(61.342129, 150.84213)),
-  "indoor-left-stairs": NavNode(id: "indoor-left-stairs", position: const Offset(61.342129, 133.84004)),
-  "indoor-right-stairs": NavNode(id: "indoor-right-stairs", position: const Offset(61.342125, 174.0567)),
-  "outdoor-left-stairs": NavNode(id: "outdoor-left-stairs", position: const Offset(145.34213, 122.99213)),
-  "outdoor-right-stairs": NavNode(id: "outdoor-right-stairs", position: const Offset(145.34213, 165.85463)),
-  "enterence": NavNode(id: "enterence", position: const Offset(145.34213, 144.84213)),
+  "indoor-left-stairs": NavNode(
+    id: "indoor-left-stairs",
+    position: const Offset(61.342129, 133.84004),
+  ),
+  "indoor-right-stairs": NavNode(
+    id: "indoor-right-stairs",
+    position: const Offset(61.342125, 174.0567),
+  ),
+  "outdoor-left-stairs": NavNode(
+    id: "outdoor-left-stairs",
+    position: const Offset(145.34213, 122.99213),
+  ),
+  "outdoor-right-stairs": NavNode(
+    id: "outdoor-right-stairs",
+    position: const Offset(145.34213, 165.85463),
+  ),
+  "enterence": NavNode(
+    id: "enterence",
+    position: const Offset(145.34213, 144.84213),
+  ),
 };
 
 // 노드들이 어떻게 연결되어 있는지 정의합니다. (인접 리스트 방식)

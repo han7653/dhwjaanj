@@ -1,4 +1,4 @@
-//lib/painters/room_shape_painter.dart
+// lib/room_shape_painter.dart
 
 import 'package:flutter/material.dart';
 import 'package:path_drawing/path_drawing.dart';

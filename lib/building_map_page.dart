@@ -1,11 +1,13 @@
+// lib/building_map_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'svg_data_parser.dart'; // 경로 확인 필요
-import 'room_info.dart';           // 경로 확인 필요
-import 'room_info_sheet.dart';  // 경로 확인 필요
+import 'room_info.dart'; // 경로 확인 필요
+import 'room_info_sheet.dart'; // 경로 확인 필요
 import 'room_shape_painter.dart'; // 경로 확인 필요
-import 'navigation_data.dart';      // 경로 확인 필요
-import 'path_painter.dart';      // 경로 확인 필요
+import 'navigation_data.dart'; // 경로 확인 필요
+import 'path_painter.dart'; // 경로 확인 필요
 
 class BuildingMapPage extends StatefulWidget {
   const BuildingMapPage({super.key});
@@ -41,7 +43,9 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
 
   Future<void> _loadFloorData(int floor) async {
     setState(() => _isLoading = true);
-    final buttons = await SvgDataParser.parseButtonData('assets/w19_$floor.svg');
+    final buttons = await SvgDataParser.parseButtonData(
+      'assets/w19_$floor.svg',
+    );
     if (mounted) {
       setState(() {
         _buttonData = buttons;
@@ -126,11 +130,17 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                     height: svgHeight * totalScale,
                     child: Stack(
                       children: [
-                        SvgPicture.asset(svgAsset, width: svgWidth * totalScale, height: svgHeight * totalScale),
+                        SvgPicture.asset(
+                          svgAsset,
+                          width: svgWidth * totalScale,
+                          height: svgHeight * totalScale,
+                        ),
                         ..._buttonData.map((buttonData) {
                           final String roomId = buttonData['id'];
                           final isSelected = roomId == selectedRoomId;
-                          final color = isSelected ? Colors.blue.withOpacity(0.7) : Colors.blue.withOpacity(0.2);
+                          final color = isSelected
+                              ? Colors.blue.withOpacity(0.7)
+                              : Colors.blue.withOpacity(0.2);
 
                           if (buttonData.containsKey('path')) {
                             return GestureDetector(
@@ -151,7 +161,10 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                               width: buttonData["width"] * totalScale,
                               height: buttonData["height"] * totalScale,
                               child: InkWell(
-                                onTap: () => _showRoomInfoSheet(context, buttonData["id"]),
+                                onTap: () => _showRoomInfoSheet(
+                                  context,
+                                  buttonData["id"],
+                                ),
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   color: color,
@@ -159,14 +172,16 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                               ),
                             );
                           }
-                        }).toList(),
+                        }),
                         if (startNodeId != null && endNodeId != null)
                           IgnorePointer(
                             child: CustomPaint(
                               size: Size.infinite,
                               painter: PathPainter(
-                                startPoint: allNavNodes[startNodeId]!.position.scale(totalScale, totalScale),
-                                endPoint: allNavNodes[endNodeId]!.position.scale(totalScale, totalScale),
+                                startPoint: allNavNodes[startNodeId]!.position
+                                    .scale(totalScale, totalScale),
+                                endPoint: allNavNodes[endNodeId]!.position
+                                    .scale(totalScale, totalScale),
                               ),
                             ),
                           ),
@@ -193,12 +208,14 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                         width: 48,
                         height: 48,
                         alignment: Alignment.center,
-                        color: isSelected ? Colors.indigo[400] : Colors.transparent,
+                        color: isSelected
+                            ? Colors.indigo[400]
+                            : Colors.transparent,
                         child: Text(
                           '$floor',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.indigo
+                            color: isSelected ? Colors.white : Colors.indigo,
                           ),
                         ),
                       ),

@@ -1,14 +1,16 @@
+// lib/room_info_sheet.dart
+
 import 'package:flutter/material.dart';
 import 'room_info.dart';
 
 // 방 정보와 출발/도착 콜백을 받아 바텀시트로 보여주는 위젯
 class RoomInfoSheet extends StatelessWidget {
-  final RoomInfo roomInfo;      // 방 정보 객체
+  final RoomInfo roomInfo; // 방 정보 객체
   final VoidCallback onDeparture; // 출발 버튼 클릭 시 실행할 콜백
-  final VoidCallback onArrival;   // 도착 버튼 클릭 시 실행할 콜백
-  final double initialChildSize;  // 시트의 초기 크기 비율
-  final double minChildSize;      // 시트의 최소 크기 비율
-  final double maxChildSize;      // 시트의 최대 크기 비율
+  final VoidCallback onArrival; // 도착 버튼 클릭 시 실행할 콜백
+  final double initialChildSize; // 시트의 초기 크기 비율
+  final double minChildSize; // 시트의 최소 크기 비율
+  final double maxChildSize; // 시트의 최대 크기 비율
 
   const RoomInfoSheet({
     super.key,
@@ -24,14 +26,16 @@ class RoomInfoSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       initialChildSize: initialChildSize, // 초기 시트 크기
-      minChildSize: minChildSize,         // 최소 시트 크기
-      maxChildSize: maxChildSize,         // 최대 시트 크기
-      expand: false,                      // 전체 화면 확장 비활성화
+      minChildSize: minChildSize, // 최소 시트 크기
+      maxChildSize: maxChildSize, // 최대 시트 크기
+      expand: false, // 전체 화면 확장 비활성화
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
             color: Colors.white, // 시트 배경색
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)), // 상단만 둥글게
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(28),
+            ), // 상단만 둥글게
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.07),
@@ -63,7 +67,11 @@ class RoomInfoSheet extends StatelessWidget {
                       CircleAvatar(
                         radius: 20,
                         backgroundColor: Colors.purple[50],
-                        child: Icon(Icons.meeting_room_outlined, size: 22, color: Colors.purple[400]),
+                        child: Icon(
+                          Icons.meeting_room_outlined,
+                          size: 22,
+                          color: Colors.purple[400],
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -103,7 +111,10 @@ class RoomInfoSheet extends StatelessWidget {
                             height: 38,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF6DD5FA), Color(0xFF2980B9)], // 파란색 그라데이션
+                                colors: [
+                                  Color(0xFF6DD5FA),
+                                  Color(0xFF2980B9),
+                                ], // 파란색 그라데이션
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -119,7 +130,11 @@ class RoomInfoSheet extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
-                                Icon(Icons.flag_outlined, color: Colors.white, size: 18),
+                                Icon(
+                                  Icons.flag_outlined,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                                 SizedBox(width: 6),
                                 Text(
                                   '출발',
@@ -143,7 +158,10 @@ class RoomInfoSheet extends StatelessWidget {
                             height: 38,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFFF7971E), Color(0xFFFF5858)], // 주황-빨강 그라데이션
+                                colors: [
+                                  Color(0xFFF7971E),
+                                  Color(0xFFFF5858),
+                                ], // 주황-빨강 그라데이션
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -159,7 +177,11 @@ class RoomInfoSheet extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
-                                Icon(Icons.location_on_outlined, color: Colors.white, size: 18),
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                                 SizedBox(width: 6),
                                 Text(
                                   '도착',

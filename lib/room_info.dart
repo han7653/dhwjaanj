@@ -1,8 +1,10 @@
+// lib/room_info.dart
+
 // 방 정보를 담는 데이터 클래스
 class RoomInfo {
-  final String id;    // 방의 고유 ID (예: "R101")
-  final String name;  // 방 이름 (예: "101호")
-  final String desc;  // 방 설명 (예: "컴퓨터공학과 강의실")
+  final String id; // 방의 고유 ID (예: "R101")
+  final String name; // 방 이름 (예: "101호")
+  final String desc; // 방 설명 (예: "컴퓨터공학과 강의실")
 
   // 생성자: 모든 필드는 필수(required)
   RoomInfo({required this.id, required this.name, required this.desc});
