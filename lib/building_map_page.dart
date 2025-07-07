@@ -13,6 +13,11 @@ import 'pathfinding_service.dart'; // ★★★ 새로 만든 길찾기 서비�
 
 class BuildingMapPage extends StatefulWidget {
   const BuildingMapPage({super.key});
+
+  // 요청 받은거 열어서 
+  // assets 경로에 저장을 해두고, 
+  // 밑에서 똑같이 쓰면 될듯??????
+
   @override
   State<BuildingMapPage> createState() => _BuildingMapPageState();
 }
