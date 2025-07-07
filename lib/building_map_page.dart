@@ -1,15 +1,12 @@
-// lib/building_map_page.dart
-
-//ddfsdfadfasdfasdfasdfasdfasdf
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'svg_data_parser.dart'; // 경로 확인 필요
-import 'room_info.dart'; // 경로 확인 필요
-import 'room_info_sheet.dart'; // 경로 확인 필요
+import 'room_info.dart';           // 경로 확인 필요
+import 'room_info_sheet.dart';  // 경로 확인 필요
 import 'room_shape_painter.dart'; // 경로 확인 필요
-import 'navigation_data.dart'; // 경로 확인 필요
-import 'path_painter.dart'; // 경로 확인 필요
+import 'navigation_data.dart';      // 경로 확인 필요
+import 'path_painter.dart';      // 경로 확인 필요
 
 class BuildingMapPage extends StatefulWidget {
   const BuildingMapPage({super.key});
@@ -35,7 +32,11 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
   String get svgAsset => 'assets/w19_$selectedFloor.svg';
 
   // SVG만 별도로 축소할 비율
-  static const double svgScale = 0.5; // 0.5 = 50% 크기, 원하는 값으로 조절
+  static const double svgScale = 0.7; // 0.5 = 50% 크기, 원하는 값으로 조절
+
+  // InteractiveViewer 컨트롤러 및 타이머
+  final TransformationController _transformationController = TransformationController();
+  Timer? _resetTimer;
 
   // --------------------------------------------------
   // 2. 생명주기 및 데이터 로딩 함수 (Lifecycle & Data Loading)
@@ -46,11 +47,16 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
     _loadFloorData(selectedFloor);
   }
 
+  @override
+  void dispose() {
+    _resetTimer?.cancel();
+    _transformationController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadFloorData(int floor) async {
     setState(() => _isLoading = true);
-    final buttons = await SvgDataParser.parseButtonData(
-      'assets/w19_$floor.svg',
-    );
+    final buttons = await SvgDataParser.parseButtonData('assets/w19_$floor.svg');
     if (mounted) {
       setState(() {
         _buttonData = buttons;
@@ -102,6 +108,14 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
     if (mounted) setState(() => selectedRoomId = null);
   }
 
+  // 확대/축소 후 5초 뒤 원상태로 복원
+  void _resetScaleAfterDelay() {
+    _resetTimer?.cancel();
+    _resetTimer = Timer(const Duration(seconds: 5), () {
+      _transformationController.value = Matrix4.identity();
+    });
+  }
+
   // --------------------------------------------------
   // 4. UI 빌드 (Build Method)
   // --------------------------------------------------
@@ -132,10 +146,15 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
               final double leftOffset = (svgWidth * totalScale - svgDisplayWidth) / 2;
               final double topOffset = (svgHeight * totalScale - svgDisplayHeight) / 2;
 
-              return Center(
+              return Align(
+                alignment: Alignment.topCenter, // 위쪽 여백 최소화
                 child: InteractiveViewer(
+                  transformationController: _transformationController,
                   minScale: 0.5,
                   maxScale: 5.0,
+                  onInteractionEnd: (_) {
+                    _resetScaleAfterDelay();
+                  },
                   child: SizedBox(
                     width: svgWidth * totalScale,
                     height: svgHeight * totalScale,
@@ -182,10 +201,7 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                               width: buttonData["width"] * totalScale * svgScale,
                               height: buttonData["height"] * totalScale * svgScale,
                               child: InkWell(
-                                onTap: () => _showRoomInfoSheet(
-                                  context,
-                                  buttonData["id"],
-                                ),
+                                onTap: () => _showRoomInfoSheet(context, buttonData["id"]),
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   color: color,
@@ -193,7 +209,7 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                               ),
                             );
                           }
-                        }),
+                        }).toList(),
                         if (startNodeId != null && endNodeId != null)
                           Positioned(
                             left: leftOffset,
@@ -235,14 +251,12 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                         width: 48,
                         height: 48,
                         alignment: Alignment.center,
-                        color: isSelected
-                            ? Colors.indigo[400]
-                            : Colors.transparent,
+                        color: isSelected ? Colors.indigo[400] : Colors.transparent,
                         child: Text(
                           '$floor',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.indigo
+                            color: isSelected ? Colors.white : Colors.indigo,
                           ),
                         ),
                       ),
