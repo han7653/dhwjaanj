@@ -32,6 +32,9 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
 
   String get svgAsset => 'assets/w19_$selectedFloor.svg';
 
+  // SVG만 별도로 축소할 비율
+  static const double svgScale = 0.5; // 0.5 = 50% 크기, 원하는 값으로 조절
+
   // --------------------------------------------------
   // 2. 생명주기 및 데이터 로딩 함수 (Lifecycle & Data Loading)
   // --------------------------------------------------
@@ -109,20 +112,26 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
       appBar: AppBar(title: const Text('강의실 안내도')),
       body: Stack(
         children: [
-          Center(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final scaleX = constraints.maxWidth / svgWidth;
-                final scaleY = constraints.maxHeight / svgHeight;
-                final baseScale = scaleX < scaleY ? scaleX : scaleY;
-                const viewScale = 0.7;
-                final totalScale = baseScale * viewScale;
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final scaleX = constraints.maxWidth / svgWidth;
+              final scaleY = constraints.maxHeight / svgHeight;
+              final baseScale = scaleX < scaleY ? scaleX : scaleY;
+              const viewScale = 1.0;
+              final totalScale = baseScale * viewScale;
 
-                if (_isLoading) {
-                  return const CircularProgressIndicator();
-                }
+              if (_isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                return InteractiveViewer(
+              // SVG 및 버튼/경로를 화면 중앙에 svgScale만큼 축소해서 배치
+              final double svgDisplayWidth = svgWidth * totalScale * svgScale;
+              final double svgDisplayHeight = svgHeight * totalScale * svgScale;
+              final double leftOffset = (svgWidth * totalScale - svgDisplayWidth) / 2;
+              final double topOffset = (svgHeight * totalScale - svgDisplayHeight) / 2;
+
+              return Center(
+                child: InteractiveViewer(
                   minScale: 0.5,
                   maxScale: 5.0,
                   child: SizedBox(
@@ -130,36 +139,49 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                     height: svgHeight * totalScale,
                     child: Stack(
                       children: [
-                        SvgPicture.asset(
-                          svgAsset,
-                          width: svgWidth * totalScale,
-                          height: svgHeight * totalScale,
+                        // SVG 이미지 (중앙에 작게)
+                        Positioned(
+                          left: leftOffset,
+                          top: topOffset,
+                          child: SvgPicture.asset(
+                            svgAsset,
+                            width: svgDisplayWidth,
+                            height: svgDisplayHeight,
+                          ),
                         ),
+                        // 버튼 및 path도 동일하게 축소 및 중앙 정렬
                         ..._buttonData.map((buttonData) {
                           final String roomId = buttonData['id'];
                           final isSelected = roomId == selectedRoomId;
                           final color = isSelected
                               ? Colors.blue.withOpacity(0.7)
                               : Colors.blue.withOpacity(0.2);
+                          final color = isSelected
+                              ? Colors.blue.withOpacity(0.7)
+                              : Colors.blue.withOpacity(0.2);
 
                           if (buttonData.containsKey('path')) {
-                            return GestureDetector(
-                              onTap: () => _showRoomInfoSheet(context, roomId),
-                              child: CustomPaint(
-                                size: Size.infinite,
-                                painter: RoomShapePainter(
-                                  svgPathData: buttonData['path'],
-                                  color: color,
-                                  scale: totalScale,
+                            return Positioned(
+                              left: leftOffset,
+                              top: topOffset,
+                              child: GestureDetector(
+                                onTap: () => _showRoomInfoSheet(context, roomId),
+                                child: CustomPaint(
+                                  size: Size(svgDisplayWidth, svgDisplayHeight),
+                                  painter: RoomShapePainter(
+                                    svgPathData: buttonData['path'],
+                                    color: color,
+                                    scale: totalScale * svgScale,
+                                  ),
                                 ),
                               ),
                             );
                           } else {
                             return Positioned(
-                              left: buttonData["x"] * totalScale,
-                              top: buttonData["y"] * totalScale,
-                              width: buttonData["width"] * totalScale,
-                              height: buttonData["height"] * totalScale,
+                              left: buttonData["x"] * totalScale * svgScale + leftOffset,
+                              top: buttonData["y"] * totalScale * svgScale + topOffset,
+                              width: buttonData["width"] * totalScale * svgScale,
+                              height: buttonData["height"] * totalScale * svgScale,
                               child: InkWell(
                                 onTap: () => _showRoomInfoSheet(
                                   context,
@@ -174,23 +196,29 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                           }
                         }),
                         if (startNodeId != null && endNodeId != null)
-                          IgnorePointer(
-                            child: CustomPaint(
-                              size: Size.infinite,
-                              painter: PathPainter(
-                                startPoint: allNavNodes[startNodeId]!.position
-                                    .scale(totalScale, totalScale),
-                                endPoint: allNavNodes[endNodeId]!.position
-                                    .scale(totalScale, totalScale),
+                          Positioned(
+                            left: leftOffset,
+                            top: topOffset,
+                            child: IgnorePointer(
+                              child: CustomPaint(
+                                size: Size(svgDisplayWidth, svgDisplayHeight),
+                                painter: PathPainter(
+                                  startPoint: allNavNodes[startNodeId]!
+                                      .position
+                                      .scale(totalScale * svgScale, totalScale * svgScale),
+                                  endPoint: allNavNodes[endNodeId]!
+                                      .position
+                                      .scale(totalScale * svgScale, totalScale * svgScale),
+                                ),
                               ),
                             ),
                           ),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
           Positioned(
             left: 20,
@@ -215,6 +243,7 @@ class _BuildingMapPageState extends State<BuildingMapPage> {
                           '$floor',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
+                            color: isSelected ? Colors.white : Colors.indigo,
                             color: isSelected ? Colors.white : Colors.indigo,
                           ),
                         ),
