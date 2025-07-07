@@ -1,94 +1,71 @@
-// lib/navigation_data.dart
-
 import 'package:flutter/material.dart';
 
-// 각 노드의 ID와 좌표를 저장하는 클래스
+// --------------------------------------------------
+// 1. 데이터 구조(모델) 정의
+// --------------------------------------------------
 class NavNode {
   final String id;
-  final Offset position; // x, y 좌표를 Offset으로 관리
-
+  final Offset position;
   NavNode({required this.id, required this.position});
 }
 
-// 모든 길찾기 노드의 정보를 정의합니다.
-// SVG 파일의 'Navigation_Nodes' 레이어에서 좌표를 추출했습니다.
-final Map<String, NavNode> allNavNodes = {
-  "101": NavNode(id: "101", position: const Offset(49.342125, 66.342125)),
-  "102": NavNode(id: "102", position: const Offset(106.84212, 66.342125)),
-  "103": NavNode(id: "103", position: const Offset(148.34213, 66.342125)),
-  "104": NavNode(id: "104", position: const Offset(181.49866, 73.68399)),
-  "105": NavNode(id: "105", position: const Offset(182.28923, 107.34212)),
-  "106": NavNode(id: "106", position: const Offset(160.58905, 107.34212)),
-  "107": NavNode(id: "107", position: const Offset(166.64838, 171.67546)),
-  "108": NavNode(id: "108", position: const Offset(183.8463, 187.55046)),
-  "109": NavNode(id: "109", position: const Offset(184.90463, 208.9817)),
-  "110": NavNode(id: "110", position: const Offset(137.80879, 220.3588)),
-  "111": NavNode(id: "111", position: const Offset(90.1838, 219.03587)),
-  "112": NavNode(id: "112", position: const Offset(30.652548, 198.34213)),
-  "b1": NavNode(id: "b1", position: const Offset(49.342125, 86.842125)),
-  "b2": NavNode(id: "b2", position: const Offset(106.84212, 86.842125)),
-  "b3": NavNode(id: "b3", position: const Offset(148.34213, 86.842125)),
-  "b4": NavNode(id: "b4", position: const Offset(49.342125, 113.99628)),
-  "b5": NavNode(id: "b5", position: const Offset(49.342125, 150.84213)),
-  "b6": NavNode(id: "b6", position: const Offset(49.342125, 198.34213)),
-  "b7": NavNode(id: "b7", position: const Offset(89.390045, 198.34213)),
-  "b8": NavNode(id: "b8", position: const Offset(138.07338, 198.34213)),
-  "b9": NavNode(id: "b9", position: const Offset(167.17755, 198.34213)),
-  "b10": NavNode(id: "b10", position: const Offset(62.66713, 113.99628)),
-  "b11": NavNode(id: "b11", position: const Offset(61.342129, 150.84213)),
-  "indoor-left-stairs": NavNode(
-    id: "indoor-left-stairs",
-    position: const Offset(61.342129, 133.84004),
-  ),
-  "indoor-right-stairs": NavNode(
-    id: "indoor-right-stairs",
-    position: const Offset(61.342125, 174.0567),
-  ),
-  "outdoor-left-stairs": NavNode(
-    id: "outdoor-left-stairs",
-    position: const Offset(145.34213, 122.99213),
-  ),
-  "outdoor-right-stairs": NavNode(
-    id: "outdoor-right-stairs",
-    position: const Offset(145.34213, 165.85463),
-  ),
-  "enterence": NavNode(
-    id: "enterence",
-    position: const Offset(145.34213, 144.84213),
-  ),
+class WeightedEdge {
+  final String nodeId;
+  final double weight;
+  WeightedEdge({required this.nodeId, required this.weight});
+}
+
+// --------------------------------------------------
+// 2. 길찾기 그래프 원본 데이터
+// --------------------------------------------------
+
+// --- (1층) Floor_Id = 3 에 해당하는 노드 연결 정보 ---
+final Map<String, List<String>> floor3AdjacencyList = {
+  '101': ['b1'], '102': ['b2'], '103': ['b3'], '104': ['b3'], '105': ['b3'],
+  '106': ['b3'], '107': ['b9'], '108': ['b9'], '109': ['b9'], '110': ['b8', 'b9'],
+  '111': ['b7'], '112': ['b6'],
+  
+  'b1': ['101', 'b2', 'b4'], 'b2': ['102', 'b1', 'b3'], 'b3': ['103', '104', '105', '106', 'b2'],
+  'b4': ['b1', 'b10', 'b5'], 'b5': ['b4', 'b11', 'b6'], 'b6': ['112', 'b5', 'b7'],
+  'b7': ['111', 'b6', 'b8'], 'b8': ['110', 'b7', 'b9'], 'b9': ['107', '108', '109', '110', 'b8'],
+  'b10': ['b4', 'enterence'], 'b11': ['b5', 'indoor-left-stairs', 'indoor-right-stairs'],
+  
+  'enterence': ['b10', 'outdoor-left-stairs', 'outdoor-right-stairs'],
+  
+  // ★★★ [수정] 1층 계단에 2층으로 가는 가상 연결점을 추가합니다. ★★★
+  // 길찾기 알고리즘이 이 특별한 ID를 보고 층간 이동을 인지하게 됩니다.
+  'indoor-left-stairs': ['b11', '5_indoor-left-stairs'], 
+  'indoor-right-stairs': ['b11', '5_indoor-right-stairs'],
+  'outdoor-left-stairs': ['enterence', '5_outdoor-left-stairs'],
+  'outdoor-right-stairs': ['enterence', '5_outdoor-right-stairs'],
 };
 
-// 노드들이 어떻게 연결되어 있는지 정의합니다. (인접 리스트 방식)
-// 각 노드와 직접 연결된 이웃 노드들의 ID 리스트입니다.
-final Map<String, List<String>> adjacencyList = {
-  // 강의실 <-> 복도 연결
-  "101": ["b1"], "b1": ["101", "b2", "b4"],
-  "102": ["b2"], "b2": ["b1", "b2"],
-  "103": ["b3"], "b3": ["b2", "104", "enterence"],
-  "104": ["b3"],
-  "105": ["b9"],
-  "106": ["b9"],
-  "107": ["b9"],
-  "108": ["b9"],
-  "109": ["b8"],
-  "110": ["b8"],
-  "111": ["b7"],
-  "112": ["b6"],
+// --- (2층) Floor_Id = 5 에 해당하는 노드 연결 정보 ---
+final Map<String, List<String>> floor5AdjacencyList = {
+  '201': ['b28'], '202': ['b26'], '203': ['b26'], '204': ['b25'], '205': ['b25'],
+  '206': ['b24'], '207': ['b24'], '208': ['b23'], '209': ['b23'], '210': ['b22'],
+  '211': ['b22'], '212': ['b21'], '213': ['b21'], '214': ['b20'], '215': ['b18'],
+  '216': ['b17'], '217': ['b16'], '218': ['b10', 'b11'], '219': ['b10'], '220': ['b9'],
+  '221': ['b7'], '222': ['b7'], '223': ['b6'], '224': ['b6'], '225': ['b5'],
+  '226': ['b5'], '227': ['b4'], '228': ['b4'], '229': ['b3'], '230': ['b3'],
+  '231': ['b2'], '232': ['b2'], '233': ['b1'],
+  
+  'b1': ['233', 'b2', 'indoor-right-stairs'], 'b2': ['231', '232', 'b1', 'b3'],
+  'b3': ['229', '230', 'b2', 'b4'], 'b4': ['227', '228', 'b3', 'b5'],
+  'b5': ['225', '226', 'b4', 'b6'], 'b6': ['223', '224', 'b5', 'b7'],
+  'b7': ['221', '222', 'b6', 'b8'], 'b8': ['b10', 'b7', 'b9'], 'b9': ['220', 'b8'],
+  'b10': ['218', '219', 'b8'], 'b11': ['218', 'b12', 'b14', 'b16'], 'b12': ['b11', 'b13'],
+  'b13': ['b12', 'outdoor-right-stairs'], 'b14': ['b11', 'b15'], 'b15': ['b14', 'outdoor-left-stairs'],
+  'b16': ['217', 'b11', 'b17'], 'b17': ['216', 'b16', 'b18'], 'b18': ['215', 'b17', 'b19'],
+  'b19': ['214', 'b18', 'b20', 'b21'], 'b20': ['214', 'b19'],
+  'b21': ['212', '213', 'b19', 'b22'], 'b22': ['210', '211', 'b21', 'b23'],
+  'b23': ['208', '209', 'b22', 'b24'], 'b24': ['206', '207', 'b23', 'b25'],
+  'b25': ['204', '205', 'b24', 'b26'], 'b26': ['202', '203', 'b25', 'b27'],
+  'b27': ['b26', 'b28'], 'b28': ['201', 'b27', 'indoor-left-stairs'],
 
-  // 복도 노드 간 연결
-  "b4": ["b1", "b5", "b10"],
-  "b5": ["b4", "b6", "b11"],
-  "b6": ["b5", "b7", "112"],
-  "b7": ["b6", "b8", "111"],
-  "b8": ["b7", "b9", "109", "110"],
-  "b9": ["b8", "105", "106", "107", "108"],
-  "b10": ["b4", "indoor-left-stairs"],
-  "b11": ["b5", "indoor-left-stairs", "indoor-right-stairs"],
-
-  // 계단 및 입구 연결
-  "indoor-left-stairs": ["b10", "b11"],
-  "indoor-right-stairs": ["b11"],
-  "enterence": ["b3", "outdoor-left-stairs", "outdoor-right-stairs"],
-  "outdoor-left-stairs": ["enterence"],
-  "outdoor-right-stairs": ["enterence"],
+  // ★★★ [수정] 2층 계단에 1층으로 가는 가상 연결점을 추가합니다. ★★★
+  'indoor-left-stairs': ['b28', '3_indoor-left-stairs'],
+  'indoor-right-stairs': ['b1', '3_indoor-right-stairs'],
+  'outdoor-left-stairs': ['b15', '3_outdoor-left-stairs'],
+  'outdoor-right-stairs': ['b13', '3_outdoor-right-stairs'],
 };
