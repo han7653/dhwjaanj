@@ -65,3 +65,4 @@ final Map<String, RoomInfo> roomInfos = {
   // 3층 테라스 정보
   "Terrace": RoomInfo(id: "Terrace", name: "테라스", desc: "야외 테라스 공간"),
 };
+
