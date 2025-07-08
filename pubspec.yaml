@@ -10,6 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  # 서버 통신을 위해 http 패키지를 추가했습니다.
+  http: ^1.2.1 
+
+  # 기존 패키지들
   flutter_svg: ^1.1.6
   path_drawing: ^1.0.1
   xml: ^6.5.0
@@ -22,7 +27,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/w19_1.svg
-    - assets/w19_2.svg
-    - assets/w19_3.svg
+
+  # 서버에서 SVG 파일을 불러오므로 이 부분은 더 이상 필요 없습니다.
+  # assets:
+  #   - assets/w19_1.svg
+  #   - assets/w19_2.svg
+  #   - assets/w19_3.svg
