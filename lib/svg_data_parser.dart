@@ -91,4 +91,51 @@ class SvgDataParser {
       return {};
     }
   }
+
+  // 네트워크에서 받은 SVG 문자열에서 버튼(rect/path) 정보를 파싱하는 함수
+  static List<Map<String, dynamic>> parseButtonDataFromString(
+    String svgString,
+  ) {
+    try {
+      final document = XmlDocument.parse(svgString);
+
+      // 'Clickable_Rooms' 그룹이 있는지 확인
+      final clickableGroups = document
+          .findAllElements('g')
+          .where((node) => node.getAttribute('id') == 'Clickable_Rooms');
+
+      // 만약 해당 그룹이 존재하지 않으면, 오류 대신 빈 리스트를 반환
+      if (clickableGroups.isEmpty) {
+        print('경고: 네트워크 SVG에 "Clickable_Rooms" 레이어가 없습니다.');
+        return [];
+      }
+
+      final clickableGroup = clickableGroups.first;
+      final List<Map<String, dynamic>> buttonList = [];
+
+      // 사각형(rect) 버튼 파싱
+      clickableGroup.findElements('rect').forEach((rect) {
+        buttonList.add({
+          'id': rect.getAttribute('id') ?? '',
+          'x': double.tryParse(rect.getAttribute('x') ?? '0.0') ?? 0.0,
+          'y': double.tryParse(rect.getAttribute('y') ?? '0.0') ?? 0.0,
+          'width': double.tryParse(rect.getAttribute('width') ?? '0.0') ?? 0.0,
+          'height': double.tryParse(rect.getAttribute('height') ?? '0.0') ?? 0.0,
+        });
+      });
+
+      // 복잡한 모양(path) 버튼 파싱
+      clickableGroup.findElements('path').forEach((path) {
+        buttonList.add({
+          'id': path.getAttribute('id') ?? '',
+          'path': path.getAttribute('d') ?? '',
+        });
+      });
+
+      return buttonList;
+    } catch (e) {
+      print('네트워크 SVG 버튼 데이터 파싱 오류: $e');
+      return [];
+    }
+  }
 }
