@@ -1,7 +1,7 @@
-// lib/main.dart (수정된 최종 코드)
+// lib/main.dart (수정된 코드)
 
 import 'package:flutter/material.dart';
-import 'package:hatesvg/building_map_page.dart'; // 지도 페이지를 import 합니다.
+import 'package:hatesvg/building_select_page.dart'; // 수정: 건물 선택 페이지 import
 
 void main() {
   runApp(const MyApp());
@@ -18,10 +18,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.indigo,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // ★★★ 수정된 부분 ★★★
-      // 더 이상 필요 없는 BuildingSelectPage 대신,
-      // BuildingMapPage를 앱의 첫 화면으로 지정합니다.
-      home: const BuildingMapPage(),
+      // 수정: 앱의 첫 화면을 BuildingSelectPage로 변경
+      home: const BuildingSelectPage(),
     );
   }
 }

@@ -1,45 +1,33 @@
-// lib/room_shape_painter.dart
+// lib/room_shape_painter.dart (수정된 전체 코드)
 
 import 'package:flutter/material.dart';
-import 'package:path_drawing/path_drawing.dart';
 
 class RoomShapePainter extends CustomPainter {
-  final String svgPathData;
-  final Color color;
-  final double scale; // <-- 1. 확대/축소 비율을 받을 변수 추가
+  final bool isSelected;
 
-  RoomShapePainter({
-    required this.svgPathData,
-    required this.color,
-    this.scale = 1.0, // <-- 2. 생성자에서 scale 값을 받도록 수정 (기본값 1.0)
-  });
+  RoomShapePainter({required this.isSelected});
 
   @override
   void paint(Canvas canvas, Size size) {
-    // <-- 3. 그림을 그리기 전에 캔버스 자체를 scale 값만큼 확대/축소
-    canvas.scale(scale);
+    final paint = Paint()..style = PaintingStyle.fill;
 
-    final path = parseSvgPathData(svgPathData);
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(path, paint);
+    if (isSelected) {
+      // 선택된 강의실은 파란색 반투명으로 하이라이트합니다.
+      paint.color = Colors.blue.withOpacity(0.5);
+    } else {
+      // 선택되지 않은 강의실은 사용자가 탭할 수 있도록 영역만 차지하고 색상은 투명하게 처리합니다.
+      // 디버깅 시에는 Colors.grey.withOpacity(0.2) 등으로 색을 지정해 영역을 확인할 수 있습니다.
+      paint.color = Colors.transparent;
+    }
+
+    // 이 Painter가 그려지는 전체 영역에 사각형을 그립니다.
+    // 영역의 크기와 위치는 building_map_page.dart의 Positioned.fromRect가 결정합니다.
+    canvas.drawRect(Offset.zero & size, paint);
   }
 
   @override
-  bool hitTest(Offset position) {
-    final path = parseSvgPathData(svgPathData);
-    // <-- 4. 클릭 좌표 역시 scale을 역으로 적용하여 정확한 위치를 판단
-    // 예: 2배 확대된 그림에서 (100, 100)을 클릭했다면,
-    // 원본 그림의 (50, 50) 위치에 해당하는지 확인해야 함
-    final scaledPosition = position.scale(1 / scale, 1 / scale);
-    return path.contains(scaledPosition);
-  }
-
-  @override
-  bool shouldRepaint(RoomShapePainter oldDelegate) {
-    return oldDelegate.svgPathData != svgPathData ||
-        oldDelegate.color != color ||
-        oldDelegate.scale != scale;
+  bool shouldRepaint(covariant RoomShapePainter oldDelegate) {
+    // isSelected 상태가 변경될 때만 다시 그리도록 최적화합니다.
+    return oldDelegate.isSelected != isSelected;
   }
 }
