@@ -1,28 +1,27 @@
-// lib/main.dart
+// lib/main.dart (수정된 최종 코드)
 
-import 'package:flutter/material.dart';         // Flutter 기본 위젯 패키지 import
-import 'building_select_page.dart';            // 건물 선택 페이지 import
+import 'package:flutter/material.dart';
+import 'package:hatesvg/building_map_page.dart'; // 지도 페이지를 import 합니다.
 
-// 앱 진입점(main 함수). 앱을 실행할 때 가장 먼저 호출됨.
 void main() {
-  runApp(const MyApp());                       // MyApp 위젯을 최상위(root)로 실행
+  runApp(const MyApp());
 }
 
-// 앱의 루트 위젯(StatelessWidget)
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '건물 도면 안내',                   // 앱의 타이틀(앱 스위처 등에서 사용)
+      title: '실내 지도 앱',
       theme: ThemeData(
-        colorSchemeSeed: Colors.blue,           // 전체 색상 테마(파란색 계열)
-        useMaterial3: true,                     // 머티리얼3 디자인 사용
-        brightness: Brightness.light,           // 밝은 테마
+        primarySwatch: Colors.indigo,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // 앱이 시작할 때 보여줄 첫 화면을 지정
-      home: const BuildingSelectPage(),         // ★ 건물 선택 페이지가 첫 화면!
+      // ★★★ 수정된 부분 ★★★
+      // 더 이상 필요 없는 BuildingSelectPage 대신,
+      // BuildingMapPage를 앱의 첫 화면으로 지정합니다.
+      home: const BuildingMapPage(),
     );
   }
 }

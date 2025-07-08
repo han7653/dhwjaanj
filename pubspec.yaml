@@ -17,14 +17,10 @@ dependencies:
   # 기존 패키지들
   flutter_svg: ^1.1.6
   path_drawing: ^1.0.1
-<<<<<<< HEAD
-  http: ^0.13.6
+  # ★★★ 중복된 http: ^0.13.6 라인을 삭제했습니다. ★★★
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-=======
-  xml: ^6.5.0
->>>>>>> 68a10b1472d11e0d1ba57bde296f86fce3f5108e
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
